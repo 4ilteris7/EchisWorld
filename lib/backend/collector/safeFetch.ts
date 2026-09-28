@@ -67,7 +67,7 @@ export class SafeFetchError extends Error {
 const DEFAULT_TIMEOUT_MS = 10_000;
 const DEFAULT_MAX_BODY_BYTES = 3 * 1024 * 1024;
 const DEFAULT_MAX_REDIRECTS = 5;
-const USER_AGENT = "EchisWorld-Collector/1.0 (+https://github.com/k4s1f-TR/EchisWorld)";
+const USER_AGENT = "EchisWorld-Collector/1.0 (+https://github.com/4ilteris7/EchisWorld)";
 
 // ── Address safety ──────────────────────────────────────────────────────────
 

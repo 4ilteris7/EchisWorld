@@ -61,7 +61,7 @@ The Monitor remains mounted while navigating to Sources or Bookmarks, so returni
 Clone and prepare the project:
 
 ```powershell
-git clone https://github.com/k4s1f-TR/EchisWorld.git
+git clone https://github.com/4ilteris7/EchisWorld.git
 cd EchisWorld
 npm.cmd ci
 npm.cmd run local:open

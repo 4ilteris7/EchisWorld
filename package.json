@@ -6,12 +6,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/k4s1f-TR/EchisWorld.git"
+    "url": "git+https://github.com/4ilteris7/EchisWorld.git"
   },
   "bugs": {
-    "url": "https://github.com/k4s1f-TR/EchisWorld/issues"
+    "url": "https://github.com/4ilteris7/EchisWorld/issues"
   },
-  "homepage": "https://github.com/k4s1f-TR/EchisWorld#readme",
+  "homepage": "https://github.com/4ilteris7/EchisWorld#readme",
   "engines": {
     "node": ">=24"
   },
