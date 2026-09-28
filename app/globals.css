@@ -1,0 +1,553 @@
+@import "tailwindcss";
+
+:root {
+  /* ── Background layers ─────────────────────────────────── */
+  --bg-base: #060305;
+  --bg-shell: #050506;
+  --bg-panel: linear-gradient(180deg, rgba(20, 16, 18, 0.28), rgba(7, 5, 7, 0.55) 50%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0 1px, transparent 1px 7px),
+    #060406;
+  --bg-panel-alt: linear-gradient(180deg, rgba(20, 16, 18, 0.24), rgba(7, 5, 7, 0.52) 50%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0 1px, transparent 1px 7px),
+    #060406;
+  --bg-card: linear-gradient(180deg, rgba(20, 16, 18, 0.2), rgba(7, 5, 7, 0.48) 50%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.009) 0 1px, transparent 1px 7px),
+    #060406;
+  --bg-card-alt: linear-gradient(180deg, rgba(20, 16, 18, 0.18), rgba(7, 5, 7, 0.46) 50%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.009) 0 1px, transparent 1px 7px),
+    #060406;
+  --bg-surface: rgba(255, 255, 255, 0.016);
+  --bg-surface-hover: rgba(255, 255, 255, 0.034);
+  --bg-surface-active: rgba(255, 255, 255, 0.055);
+  --bg-overlay: rgba(8, 8, 10, 0.94);
+  --bg-backdrop: rgba(2, 2, 3, 0.68);
+  --bg-info-strip: rgba(4, 4, 6, 0.95);
+
+  /* ── Border layers ─────────────────────────────────────── */
+  --border-primary: rgba(255, 255, 255, 0.07);
+  --border-dim: rgba(255, 255, 255, 0.045);
+  --border-subtle: rgba(255, 255, 255, 0.03);
+  --border-hover: rgba(255, 255, 255, 0.09);
+  --border-accent: rgba(240, 64, 76, 0.4);
+  --border-divider: rgba(255, 255, 255, 0.04);
+
+  /* ── Text layers ───────────────────────────────────────── */
+  --text-heading: rgba(238, 240, 244, 0.98);
+  --text-primary: rgba(214, 219, 226, 0.92);
+  --text-body: rgba(176, 184, 196, 0.82);
+  --text-secondary: rgba(132, 142, 156, 0.72);
+  --text-tertiary: rgba(96, 105, 119, 0.64);
+  --text-muted: rgba(70, 78, 90, 0.6);
+  --text-dim: rgba(55, 60, 68, 0.45);
+
+  /* Cyber News text ladder, aliased globally (identical values to the
+     --text-* layers above) so feed/panel text — including modals portaled
+     to <body> outside .cyber-premium — can reference the canonical ladder. */
+  --c-t1: rgba(238, 240, 244, 0.98);
+  --c-t2: rgba(214, 219, 226, 0.92);
+  --c-t3: rgba(176, 184, 196, 0.82);
+  --c-t4: rgba(132, 142, 156, 0.72);
+  --c-t5: rgba(96, 105, 119, 0.64);
+  --c-t6: rgba(70, 78, 90, 0.6);
+
+  /* ── Icon layers ───────────────────────────────────────── */
+  --icon-default: rgba(70, 76, 86, 0.7);
+  --icon-hover: rgba(175, 182, 192, 0.88);
+  --icon-active: rgba(250, 90, 100, 0.92);
+
+  /* ── Accent: blue ──────────────────────────────────────── */
+  --accent-blue: #ec2f3b;
+  --accent-blue-text: rgba(250, 86, 96, 0.95);
+  --accent-blue-bg: rgba(225, 40, 52, 0.10);
+  --accent-blue-bg-strong: rgba(225, 40, 52, 0.16);
+  --accent-blue-border: rgba(240, 64, 76, 0.32);
+  --accent-blue-glow: rgba(236, 47, 59, 0.28);
+
+  /* ── Accent: crimson gradient (left → right) ───────────────
+     Canonical red gradient: deep crimson on the left fading to vivid
+     crimson on the right. Used for every filled red element (bars,
+     meters, indicators) and, via .accent-grad-text, for red text. */
+  --accent-grad: linear-gradient(90deg, #b3121f 0%, #ff2b3d 100%);
+
+  /* ── Silver: supporting metal (new) ────────────────────── */
+  --silver: rgba(196, 202, 212, 0.94);
+  --silver-dim: rgba(150, 158, 170, 0.74);
+  --silver-bg: rgba(184, 190, 202, 0.055);
+  --silver-border: rgba(184, 190, 202, 0.18);
+
+  /* ── Accent: green ─────────────────────────────────────── */
+  --accent-green: rgba(176, 184, 196, 0.88);
+  --accent-green-dim: rgba(176, 184, 196, 0.2);
+  --accent-green-bg: rgba(176, 184, 196, 0.065);
+  --accent-green-border: rgba(176, 184, 196, 0.2);
+  --accent-green-dot: rgba(255, 86, 96, 0.72);
+
+  /* ── Severity: critical ────────────────────────────────── */
+  --sev-critical-text: rgba(235, 72, 72, 0.92);
+  --sev-critical-bg: rgba(235, 72, 72, 0.08);
+  --sev-critical-border: rgba(235, 72, 72, 0.28);
+
+  /* ── Severity: high ────────────────────────────────────── */
+  --sev-high-text: rgba(242, 115, 28, 0.92);
+  --sev-high-bg: rgba(242, 115, 28, 0.07);
+  --sev-high-border: rgba(242, 115, 28, 0.26);
+
+  /* ── Severity: medium ──────────────────────────────────── */
+  --sev-medium-text: rgba(225, 175, 12, 0.9);
+  --sev-medium-bg: rgba(225, 175, 12, 0.065);
+  --sev-medium-border: rgba(225, 175, 12, 0.24);
+
+  /* ── Severity: low ─────────────────────────────────────── */
+  --sev-low-text: rgba(130, 138, 148, 0.78);
+  --sev-low-bg: rgba(95, 100, 110, 0.06);
+  --sev-low-border: rgba(95, 100, 110, 0.18);
+
+  /* ── Semantic: category colors ─────────────────────────── */
+  --cat-diplomatic: rgba(155, 132, 238, 0.85);
+  --cat-diplomatic-bg: rgba(72, 30, 142, 0.12);
+  --cat-diplomatic-border: rgba(155, 132, 238, 0.2);
+  --cat-intelligence: rgba(45, 200, 142, 0.82);
+  --cat-amber: rgba(235, 185, 35, 0.85);
+  --cat-amber-bg: rgba(108, 62, 16, 0.12);
+  --cat-amber-border: rgba(235, 185, 35, 0.2);
+
+  /* ── Shadow ────────────────────────────────────────────── */
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.5);
+  --shadow-inset-highlight: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+
+  /* ── Typography scale ──────────────────────────────────────
+     Aligned to the Cyber News scale (--c-fs-*) so feed/panel text
+     across every screen matches Cyber's sizes. */
+  --fs-2xs: 8.5px;
+  --fs-xs: 9.5px;
+  --fs-sm: 10.5px;
+  --fs-base: 11.5px;
+  --fs-md: 12.5px;
+  --fs-lg: 14px;
+  --fs-xl: 17px;
+  --fs-2xl: 22px;
+
+  /* ── Spacing scale ─────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 7px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+
+  /* ── Scrollbar accent (override per-section) ───────────── */
+  --scrollbar-accent: rgba(255, 255, 255, 0.08);
+  --scrollbar-accent-hover: rgba(255, 255, 255, 0.15);
+  --scrollbar-track: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family:
+    var(--font-ui),
+    "Hanken Grotesk",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+/* Dark scrollbar */
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Parametric scrollbar ────────────────────────────────── */
+.tm-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-accent) var(--scrollbar-track);
+}
+.tm-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.tm-scrollbar::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+.tm-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-accent);
+  border-radius: 999px;
+}
+.tm-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-accent-hover);
+}
+
+/* Per-section scrollbar accent overrides */
+.politics-feed-scrollbar {
+  --scrollbar-accent: rgba(255, 255, 255, 0.06);
+  --scrollbar-accent-hover: rgba(255, 255, 255, 0.12);
+}
+
+/* Sources V2 "Density Matrix" table — flush row + ghost icon-button hovers. */
+.sources-v2-row:hover {
+  background: rgba(255, 255, 255, 0.018) !important;
+}
+.sources-v2-iconbtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: rgba(238, 240, 244, 0.96) !important;
+}
+.cyber-scrollbar {
+  --scrollbar-accent: rgba(255, 255, 255, 0.05);
+  --scrollbar-accent-hover: rgba(255, 255, 255, 0.1);
+}
+.defense-scrollbar {
+  --scrollbar-accent: rgba(255, 255, 255, 0.05);
+  --scrollbar-accent-hover: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes ui-fade-in-kf {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ui-fade-in {
+  animation: ui-fade-in-kf 120ms ease-out both;
+}
+
+@keyframes gateway-screen-enter-kf {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.997);
+  }
+  55% {
+    opacity: 0.82;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.gateway-screen-enter {
+  animation: gateway-screen-enter-kf 460ms cubic-bezier(0.22, 0.8, 0.22, 1) both;
+}
+
+@keyframes nav-active-indicator-kf {
+  from {
+    opacity: 0;
+    transform: scaleX(0.35);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.nav-active-indicator {
+  transform-origin: center;
+  animation: nav-active-indicator-kf 320ms cubic-bezier(0.22, 0.8, 0.22, 1) both;
+}
+
+@keyframes rail-active-indicator-kf {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scaleY(0.35);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1);
+  }
+}
+
+.rail-active-indicator {
+  transform-origin: center;
+  animation: rail-active-indicator-kf 300ms cubic-bezier(0.22, 0.8, 0.22, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-fade-in,
+  .gateway-screen-enter,
+  .nav-active-indicator,
+  .rail-active-indicator {
+    animation: none;
+  }
+}
+
+/* Left→right crimson gradient applied to text (the red text counterpart of
+   the filled --accent-grad). */
+.accent-grad-text {
+  background: var(--accent-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #ff2b3d;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CYBER NEWS — PREMIUM REDESIGN (scoped tokens + motion)
+   Deep black + vivid crimson + cool silver. Scoped to `.cyber-premium`
+   so no other screen inherits these tokens.
+   ════════════════════════════════════════════════════════════════ */
+.cyber-premium {
+  /* ── Fonts ─────────────────────────────────────────────── */
+  --font-disp: var(--font-display), "Space Grotesk", sans-serif;
+  --font-body: var(--font-ui), "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-num: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+
+  /* ── Surfaces ──────────────────────────────────────────── */
+  --c-bg-base: #060305;
+  --c-bg-deep: #030203;
+  --c-panel-bg: #060406;
+  --c-panel-grad: linear-gradient(180deg, rgba(20, 16, 18, 0.28), rgba(7, 5, 7, 0.55) 50%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0 1px, transparent 1px 7px);
+  --c-card-bg: rgba(255, 255, 255, 0.016);
+  --c-card-bg-hover: rgba(255, 255, 255, 0.034);
+  --c-border-1: rgba(255, 255, 255, 0.07);
+  --c-border-2: rgba(255, 255, 255, 0.045);
+  --c-border-3: rgba(255, 255, 255, 0.028);
+
+  /* ── Text ladder (cool silver) ─────────────────────────── */
+  --c-t1: rgba(238, 240, 244, 0.98);
+  --c-t2: rgba(214, 219, 226, 0.92);
+  --c-t3: rgba(176, 184, 196, 0.82);
+  --c-t4: rgba(132, 142, 156, 0.72);
+  --c-t5: rgba(96, 105, 119, 0.64);
+  --c-t6: rgba(70, 78, 90, 0.6);
+  --c-silver: rgba(196, 202, 212, 0.94);
+  --c-silver-dim: rgba(150, 158, 170, 0.74);
+  --c-silver-bg: rgba(184, 192, 206, 0.055);
+  --c-silver-border: rgba(184, 192, 206, 0.16);
+
+  /* ── Accent (crimson) ──────────────────────────────────── */
+  --c-accent: #ff2b3d;
+  --c-accent-2: #b3121f;
+  --c-accent-text: rgba(255, 86, 96, 1);
+  --c-accent-bg: rgba(255, 43, 61, 0.13);
+  --c-accent-bg-soft: rgba(255, 43, 61, 0.06);
+  --c-accent-border: rgba(255, 72, 84, 0.42);
+  --c-accent-glow: rgba(255, 43, 61, 0.42);
+  /* Vertical "red click" gradient — crimson fading down into the dark surface.
+     Shared by the map-system switch, filter chips, and selected feed cards. */
+  --c-accent-grad-soft: linear-gradient(
+    180deg,
+    rgba(255, 43, 61, 0.17) 0%,
+    rgba(255, 43, 61, 0.05) 100%
+  );
+
+  /* ── Severity (UI badges, red family) ──────────────────── */
+  --c-crit: rgba(255, 72, 82, 0.98);
+  --c-crit-bg: rgba(255, 56, 68, 0.13);
+  --c-crit-border: rgba(255, 72, 82, 0.4);
+  --c-high: rgba(255, 122, 47, 0.95);
+  --c-high-bg: rgba(255, 122, 47, 0.11);
+  --c-high-border: rgba(255, 122, 47, 0.34);
+  --c-med: rgba(241, 194, 79, 0.95);
+  --c-med-bg: rgba(241, 194, 79, 0.12);
+  --c-med-border: rgba(241, 194, 79, 0.32);
+  --c-elev: rgba(176, 184, 196, 0.82);
+  --c-elev-bg: rgba(176, 184, 196, 0.07);
+  --c-elev-border: rgba(176, 184, 196, 0.2);
+
+  /* ── Radius / type scale ───────────────────────────────── */
+  --c-radius: 12px;
+  --c-radius-sm: 8px;
+  --c-radius-xs: 5px;
+  --c-fs-2xs: 8.5px;
+  --c-fs-xs: 9.5px;
+  --c-fs-sm: 10.5px;
+  --c-fs-base: 11.5px;
+  --c-fs-md: 12.5px;
+  --c-fs-lg: 14px;
+  --c-fs-xl: 17px;
+
+  font-family: var(--font-body);
+  background: var(--c-bg-base);
+  color: var(--c-t2);
+  position: relative;
+}
+
+/* faint vignette + top crimson wash for depth */
+.cyber-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(120% 80% at 50% -8%, rgba(255, 43, 61, 0.03), transparent 55%),
+    radial-gradient(140% 120% at 50% 120%, rgba(0, 0, 0, 0.6), transparent 60%);
+}
+.cyber-premium > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cyber-premium .c-mono {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+.cyber-premium .c-disp {
+  font-family: var(--font-disp);
+}
+
+/* ── Premium panel shell ─────────────────────────────────── */
+.cyber-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--c-panel-bg);
+  background-image: var(--c-panel-grad);
+  border: 1px solid var(--c-border-1);
+  border-radius: var(--c-radius);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 14px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+.cyber-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--c-border-2);
+}
+.cyber-panel-title {
+  font-family: var(--font-disp);
+  font-size: var(--c-fs-sm);
+  font-weight: 600;
+  color: var(--c-t4);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ── Live pill ───────────────────────────────────────────── */
+.cyber-live-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--c-fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-accent-text);
+}
+.cyber-live-pill .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  box-shadow: 0 0 7px var(--c-accent-glow);
+  animation: cyber-pulse 1.8s infinite;
+}
+@keyframes cyber-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* ── Context fade ────────────────────────────────────────── */
+.cyber-ctx-fade {
+  animation: cyber-ctx-fade-kf 380ms ease;
+}
+@keyframes cyber-ctx-fade-kf {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+
+/* NOTE: Cyber Threat Map marker + animation styles (radar ping, breathing core,
+   attack comet, focus marker) were removed — that system is being redesigned. */
+
+@media (prefers-reduced-motion: reduce) {
+  .cyber-ctx-fade { animation: none; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   POLICY — "DOSSIER" (editorial geopolitical feed)
+   Reuses the crimson/silver `--c-*` ladder already defined on
+   `.cyber-premium` (the Policy screen renders inside it). This scope
+   only adds the editorial serif alias, the airy scrollbar accent, and
+   the two header/feed live-dot keyframes from the design handoff.
+   ════════════════════════════════════════════════════════════════ */
+.policy-dossier {
+  --pd-serif: var(--font-serif), Georgia, "Times New Roman", serif;
+  --scrollbar-accent: rgba(255, 255, 255, 0.07);
+  --scrollbar-accent-hover: rgba(255, 72, 84, 0.3);
+}
+.policy-dossier .pd-serif {
+  font-family: var(--pd-serif);
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.82); }
+}
+@keyframes liveBlink {
+  0%, 100% { opacity: 0.95; }
+  50% { opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .policy-dossier [style*="pulseDot"],
+  .policy-dossier [style*="liveBlink"] { animation: none !important; }
+}
+
+/* ── MapLibre compact attribution ("Toggle attribution") ────────────────────
+   The stock (i) toggle renders as a bright white chip that dominates the map
+   corner, and its expanded panel is bulky. Drop the white box, fade the whole
+   control so it blends into the basemap, and scale it down (the scale shrinks
+   the button, icon and expanded text together). */
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  transform: scale(0.7);
+  /* Bottom-left is the only edge the corner flex layout keeps fixed, so both
+     the scale pivot and the (i) button (re-pinned below) anchor there — that
+     keeps the circle from moving as the panel expands/collapses. */
+  transform-origin: bottom left;
+  opacity: 0.4;
+  min-height: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  transition: opacity 140ms ease;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact:hover {
+  opacity: 0.85;
+}
+/* Dim the (i) button circle so it no longer reads as a bright white dot, and
+   pin it to the bottom edge (the fixed corner) so it doesn't drift vertically
+   when the panel expands/collapses and the container height changes. */
+.maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
+  background-color: rgba(255, 255, 255, 0.22) !important;
+  top: auto !important;
+  bottom: 0 !important;
+}
+/* Expanded panel: translucent dark sheet + small light text instead of the
+   opaque white block, so it takes far less visual space when open. */
+.maplibregl-ctrl-attrib.maplibregl-compact-show {
+  opacity: 0.95;
+  background-color: rgba(7, 8, 10, 0.82) !important;
+  border-radius: 9px !important;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner {
+  font-size: 9px;
+  line-height: 1.4;
+}
+.maplibregl-ctrl-attrib a,
+.maplibregl-ctrl-attrib-inner {
+  color: rgba(255, 255, 255, 0.6) !important;
+}

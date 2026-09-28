@@ -1,0 +1,96 @@
+# Complete local application. Independent of both the VPS and the legacy dev DB.
+# Use npm run local:start; secrets are generated into .env.echis-local.
+name: echis-local
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    image: postgres:18.4-alpine
+    environment:
+      POSTGRES_DB: echis
+      POSTGRES_USER: echis_owner
+      POSTGRES_PASSWORD: ${ECHIS_DB_OWNER_PASSWORD:?Run npm run local:setup}
+      ECHIS_WORKER_PASSWORD: ${ECHIS_DB_WORKER_PASSWORD:?Run npm run local:setup}
+      ECHIS_WEB_PASSWORD: ${ECHIS_DB_WEB_PASSWORD:?Run npm run local:setup}
+    ports:
+      - "127.0.0.1:${ECHIS_LOCAL_DB_PORT:-5433}:5432"
+    volumes:
+      - data:/var/lib/postgresql
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U echis_owner -d echis"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+    logging: *logging
+
+  migrate:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: migrate
+    environment:
+      ECHIS_DATABASE_URL_OWNER: postgres://echis_owner:${ECHIS_DB_OWNER_PASSWORD}@db:5432/echis
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    logging: *logging
+
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: worker
+    env_file:
+      - path: ../.env.local
+        required: false
+    environment:
+      ECHIS_DATABASE_URL_WORKER: postgres://echis_worker:${ECHIS_DB_WORKER_PASSWORD}@db:5432/echis
+      ECHIS_BUILD_ID: local
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    stop_grace_period: 60s
+    restart: unless-stopped
+    logging: *logging
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: web
+    env_file:
+      - path: ../.env.local
+        required: false
+    environment:
+      ECHIS_DATABASE_URL_WEB: postgres://echis_web:${ECHIS_DB_WEB_PASSWORD}@db:5432/echis
+      ECHIS_BUILD_ID: local
+    ports:
+      - "127.0.0.1:${ECHIS_LOCAL_WEB_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      worker:
+        condition: service_started
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 20s
+    restart: unless-stopped
+    logging: *logging
+
+volumes:
+  data:

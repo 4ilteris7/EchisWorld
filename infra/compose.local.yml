@@ -1,0 +1,50 @@
+# ECHIS local backend services (F1A).
+#
+# Usage:
+#   npm run backend:up     → start PostgreSQL and wait until healthy
+#   npm run backend:down   → stop (data volume is preserved)
+#
+# The web/worker processes run on the host during development (npm run dev /
+# worker:dev); only stateful infrastructure runs in containers, so local and
+# VPS deployments share the same database engine and healthcheck contract.
+#
+# Passwords below are LOCAL DEVELOPMENT defaults only. Production (Faz 8)
+# uses compose.production.yml with real secrets provided via the host
+# environment — never committed.
+
+name: echis-backend
+
+services:
+  db:
+    # Exact patch pinned per roadmap §4 — upgrade deliberately, never `latest`.
+    image: postgres:18.4-alpine
+    environment:
+      POSTGRES_DB: echis
+      POSTGRES_USER: echis_owner
+      POSTGRES_PASSWORD: ${ECHIS_DB_OWNER_PASSWORD:-echis_local_owner_dev}
+      ECHIS_WORKER_PASSWORD: ${ECHIS_DB_WORKER_PASSWORD:-echis_local_worker_dev}
+      ECHIS_WEB_PASSWORD: ${ECHIS_DB_WEB_PASSWORD:-echis_local_web_dev}
+    ports:
+      # Loopback only — the database is never exposed to the network.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      # postgres:18 images keep PGDATA under /var/lib/postgresql (new layout).
+      - echis-db-data:/var/lib/postgresql
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U echis_owner -d echis"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+    # Bounded logs (§15.2) — size + file-count cap so container logs can't fill
+    # the disk. The production compose applies the same to web + worker.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  echis-db-data:

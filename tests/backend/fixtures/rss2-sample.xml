@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Fixture Wire Service</title>
+    <link>https://fixture-wire.example</link>
+    <description>Synthetic RSS 2.0 fixture for parser tests. No real content.</description>
+    <ttl>15</ttl>
+    <item>
+      <title>Fixture summit concludes with joint statement</title>
+      <link>https://fixture-wire.example/articles/summit-statement?utm_source=rss&amp;utm_medium=feed</link>
+      <guid isPermaLink="false">fixture-guid-001</guid>
+      <description><![CDATA[Delegations from <b>two fixture states</b> issued a joint statement after talks.]]></description>
+      <pubDate>Wed, 22 Jul 2026 09:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Ministry publishes annual fixture report</title>
+      <link>https://fixture-wire.example/articles/annual-report</link>
+      <guid isPermaLink="false">fixture-guid-002</guid>
+      <description>The fixture ministry released its annual public report.</description>
+      <pubDate>Wed, 22 Jul 2026 08:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title></title>
+      <link>https://fixture-wire.example/articles/malformed</link>
+      <description>Item with empty title must be skipped, not fail the feed.</description>
+    </item>
+    <item>
+      <title>Subscribe to our newsletter for updates</title>
+      <link>https://fixture-wire.example/newsletter</link>
+      <description>Editorial subscription plug that the parser must drop.</description>
+      <pubDate>Wed, 22 Jul 2026 07:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

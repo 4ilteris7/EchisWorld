@@ -1,0 +1,49 @@
+# ECHIS reverse proxy (F8A).
+#
+# The domain comes from the ECHIS_DOMAIN environment variable, which compose
+# passes in from `.env.production` — so switching or adding a domain never
+# requires editing this file.
+#
+# Caddy obtains and renews the TLS certificate automatically and redirects
+# HTTP → HTTPS on its own; nothing here needs to configure that.
+
+{$ECHIS_DOMAIN} {
+	# Roadmap §11.4: response compression is required. zstd first, gzip as the
+	# universally supported fallback.
+	encode zstd gzip
+
+	# Static geographic interaction assets are generated deliberately and can be
+	# cached independently from the application bundle.
+	# One hour is a safe default: meaningful egress saving, short enough that a
+	# regenerated asset propagates quickly. Raise it once asset names are
+	# content-hashed.
+	@static_data path /data/*
+	header @static_data Cache-Control "public, max-age=3600"
+
+	reverse_proxy web:3000 {
+		# SECURITY — do not remove.
+		#
+		# The app's rate limiter (lib/backend/http/rateLimit.ts) buckets clients
+		# by the FIRST value of X-Forwarded-For. Caddy's default behaviour is to
+		# APPEND the real peer address to whatever the client sent, so a caller
+		# supplying its own X-Forwarded-For would own the first value and could
+		# rotate it to bypass the limit entirely. Overwriting the header with the
+		# real TCP peer closes that hole at the proxy, where it belongs.
+		#
+		# If a CDN (e.g. Cloudflare) is ever placed in front of this server, this
+		# line must change to read the CDN's client-IP header INSTEAD — and only
+		# after restricting inbound traffic to that CDN's address ranges,
+		# otherwise the spoofing hole simply moves up one layer:
+		#   header_up X-Forwarded-For {http.request.header.CF-Connecting-IP}
+		header_up X-Forwarded-For {remote_host}
+	}
+}
+
+# www → apex, so the site has exactly one canonical address.
+# Requires a `www` DNS record pointing at this server; without it Caddy will
+# keep retrying (and failing) certificate issuance for this name — harmless to
+# the apex site, but noisy in the logs. Delete this block if you do not want a
+# www record at all.
+www.{$ECHIS_DOMAIN} {
+	redir https://{$ECHIS_DOMAIN}{uri} permanent
+}

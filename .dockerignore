@@ -1,0 +1,32 @@
+# Build context hygiene for infra/Dockerfile.
+#
+# The first rule is the important one: secrets must never enter the image
+# layers. Everything else keeps the context small so builds stay fast.
+
+# ── secrets (non-negotiable) ────────────────────────────────────────────────
+.env
+.env.*
+
+# ── VCS / editor ────────────────────────────────────────────────────────────
+.git
+.gitignore
+.vscode
+.idea
+.agents
+
+# ── build output and caches (rebuilt inside the image) ──────────────────────
+node_modules
+.next
+dist
+tsconfig.tsbuildinfo
+
+# ── local-only infrastructure and data ──────────────────────────────────────
+infra/compose.local.yml
+backups
+.cache
+data/*.ndjson
+
+# ── documentation and tests (not needed at runtime or build) ────────────────
+docs
+tests
+*.md

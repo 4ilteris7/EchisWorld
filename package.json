@@ -1,0 +1,83 @@
+{
+  "name": "echisworld",
+  "version": "0.1.0",
+  "description": "EchisWorld — a local-first public-source situational-awareness dashboard.",
+  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k4s1f-TR/EchisWorld.git"
+  },
+  "bugs": {
+    "url": "https://github.com/k4s1f-TR/EchisWorld/issues"
+  },
+  "homepage": "https://github.com/k4s1f-TR/EchisWorld#readme",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "prepare:maplibre": "node scripts/copy-maplibre-worker.mjs",
+    "predev": "npm run prepare:maplibre",
+    "dev": "node scripts/local.mjs dev",
+    "predev:webpack": "npm run prepare:maplibre",
+    "dev:webpack": "node scripts/local.mjs dev-webpack",
+    "prebuild": "npm run prepare:maplibre",
+    "build": "next build --webpack",
+    "start": "next start --hostname 127.0.0.1",
+    "local:setup": "node scripts/local.mjs setup",
+    "local:start": "node scripts/local.mjs start",
+    "local:open": "node scripts/local.mjs open",
+    "local:rebuild": "node scripts/local.mjs rebuild",
+    "prelocal:dev": "npm run prepare:maplibre",
+    "local:dev": "node scripts/local.mjs dev",
+    "local:stop": "node scripts/local.mjs stop",
+    "local:status": "node scripts/local.mjs status",
+    "local:backup": "node scripts/local.mjs backup",
+    "local:restore": "node scripts/local.mjs restore",
+    "local:geo": "node scripts/local.mjs geo",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --pretty false --incremental false",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "backend:up": "docker compose -f infra/compose.local.yml up -d --wait",
+    "backend:down": "docker compose -f infra/compose.local.yml down",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "db:status": "node scripts/db-migrate.mjs --status",
+    "db:backup": "node scripts/db-backup.mjs",
+    "db:restore": "node scripts/db-restore.mjs",
+    "measure:baseline": "node scripts/measure-baseline.mjs",
+    "soak:report": "node scripts/soak-report.mjs",
+    "worker:build": "node scripts/build-worker.mjs",
+    "worker:start": "node --env-file-if-exists=.env.local dist/worker/index.cjs",
+    "geo:build": "node scripts/build-admin-boundaries.mjs",
+    "geo:load": "node scripts/load-admin-boundaries.mjs",
+    "generate:home-globe": "node scripts/generate-home-globe-geojson.mjs"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "jsdom": "^30.1.1",
+    "lucide-react": "^1.14.0",
+    "maplibre-gl": "^6.10.0",
+    "next": "^16.3.3",
+    "pg": "^8.22.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^20",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/topojson-client": "^3.1.5",
+    "esbuild": "^0.28.1",
+    "eslint": "^9",
+    "eslint-config-next": "^16.2.10",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^4.1.10"
+  }
+}

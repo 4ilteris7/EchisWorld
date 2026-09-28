@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Fixture Security Blog</title>
+  <id>urn:uuid:00000000-0000-0000-0000-000000000001</id>
+  <updated>2026-07-22T10:00:00Z</updated>
+  <entry>
+    <title>Fixture advisory: patch released for sample flaw</title>
+    <id>urn:uuid:00000000-0000-0000-0000-0000000000a1</id>
+    <link rel="alternate" href="https://fixture-security.example/advisories/sample-flaw"/>
+    <updated>2026-07-22T10:00:00Z</updated>
+    <published>2026-07-22T09:45:00Z</published>
+    <summary>A synthetic advisory describing a fictional patched flaw.</summary>
+  </entry>
+  <entry>
+    <title>Fixture analysis of a hypothetical campaign</title>
+    <id>urn:uuid:00000000-0000-0000-0000-0000000000a2</id>
+    <link rel="alternate" href="https://fixture-security.example/analysis/hypothetical-campaign"/>
+    <updated>2026-07-21T16:20:00Z</updated>
+    <published>2026-07-21T16:00:00Z</published>
+    <summary>Entirely fictional analysis entry used only for parser tests.</summary>
+  </entry>
+</feed>

@@ -1,0 +1,148 @@
+# ECHIS production stack (F8A) — roadmap §13 topology.
+#
+#   Internet → Caddy :80/:443 → web :3000 ─┐
+#                                          ├─ PostgreSQL (private network only)
+#                              worker ─────┘
+#
+# Usage on the VPS — run from the repository root, and always pass --env-file:
+#   docker compose --env-file .env.production -f infra/compose.production.yml up -d --build
+#   docker compose --env-file .env.production -f infra/compose.production.yml logs -f worker
+#   docker compose --env-file .env.production -f infra/compose.production.yml down
+#
+# Why --env-file is mandatory: `env_file:` below only injects variables INTO
+# containers. The ${...} placeholders in this YAML are resolved by Compose
+# itself, which reads them from the shell or from --env-file — not from
+# `env_file:`. Without the flag every required-variable check below fails.
+#
+# Secrets come from `.env.production` in the repository root — never committed
+# (.gitignore covers .env*), never baked into an image (.dockerignore covers it).
+#
+# DATABASE PASSWORDS MUST BE URL-SAFE. They are interpolated into connection
+# URLs below (postgres://user:PASSWORD@db:5432/echis), so a password containing
+# '/', '@', '+', ':' or '?' produces a malformed URL and every consumer dies
+# with "Invalid URL" — while the database itself starts fine, because Postgres
+# receives the password literally. Generate them with:
+#     openssl rand -hex 24
+# NOT with `openssl rand -base64 24`, whose alphabet includes '/' and '+'.
+#
+# Ordering contract (§12 Faz 8): db healthy → migrate completes → web + worker.
+
+name: echis
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # ── PostgreSQL ────────────────────────────────────────────────────────────
+  # Never published to the host: only the compose network can reach it.
+  db:
+    image: postgres:18.4-alpine
+    env_file: ../.env.production
+    environment:
+      POSTGRES_DB: echis
+      POSTGRES_USER: echis_owner
+      POSTGRES_PASSWORD: ${ECHIS_DB_OWNER_PASSWORD:?ECHIS_DB_OWNER_PASSWORD is required}
+      ECHIS_WORKER_PASSWORD: ${ECHIS_DB_WORKER_PASSWORD:?ECHIS_DB_WORKER_PASSWORD is required}
+      ECHIS_WEB_PASSWORD: ${ECHIS_DB_WEB_PASSWORD:?ECHIS_DB_WEB_PASSWORD is required}
+    volumes:
+      - echis-db-data:/var/lib/postgresql
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U echis_owner -d echis"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ── Migration (one-shot, runs before web/worker) ──────────────────────────
+  migrate:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: migrate
+    environment:
+      ECHIS_DATABASE_URL_OWNER: postgres://echis_owner:${ECHIS_DB_OWNER_PASSWORD}@db:5432/echis
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    logging: *default-logging
+
+  # ── Collector worker ──────────────────────────────────────────────────────
+  # Single instance by contract: a second copy refuses to run (advisory lock).
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: worker
+    env_file: ../.env.production
+    environment:
+      ECHIS_DATABASE_URL_WORKER: postgres://echis_worker:${ECHIS_DB_WORKER_PASSWORD}@db:5432/echis
+      ECHIS_BUILD_ID: ${ECHIS_BUILD_ID:-prod}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    # Graceful shutdown needs room for the in-flight tick to finish.
+    stop_grace_period: 30s
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ── Next.js web ───────────────────────────────────────────────────────────
+  # Read-only database role; serves payloads the worker already composed.
+  web:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: web
+    env_file: ../.env.production
+    environment:
+      ECHIS_DATABASE_URL_WEB: postgres://echis_web:${ECHIS_DB_WEB_PASSWORD}@db:5432/echis
+      ECHIS_BUILD_ID: ${ECHIS_BUILD_ID:-prod}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+    logging: *default-logging
+
+  # ── Caddy (TLS termination, compression, the only public surface) ─────────
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      ECHIS_DOMAIN: ${ECHIS_DOMAIN:?ECHIS_DOMAIN is required}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *default-logging
+
+volumes:
+  echis-db-data:
+  caddy-data:
+  caddy-config:
